@@ -76,7 +76,7 @@ class IMDBSpider(CrawlSpider):
             yield request
 
         else:
-            print ">>>>>>>>>>>>>>>>>>>> Synopsis of \"{}\" NOT FOUND!!!!".format(title)
+            print colors.FAIL + ">>>>>>>>>>>>>>>>>>>> Synopsis of \"{}\" NOT FOUND!!!!".format(title) + colors.ENDC
 
     def parse_synopsis(self,response):
         print "=====================parse_synopsis================================"
@@ -84,6 +84,16 @@ class IMDBSpider(CrawlSpider):
         synopsis = response.xpath("//div[@id='swiki.2.1']/text()").extract() # list of paragraphs
         item['Synopsis'] = synopsis
         print item
+
+class colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 
