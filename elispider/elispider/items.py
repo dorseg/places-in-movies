@@ -7,36 +7,14 @@
 
 from scrapy.item import Item, Field
 
-
 class MovieItem(Item):
+    MainPageUrl = Field()
     Title = Field()
     Rating = Field()
-    Ranking = Field() # this is the number it is in the list
-    ReleaseDate = Field()
-    MainPageUrl = Field()
-
-    # extra detials
+    Year = Field()
+    ID = Field()
     Director = Field()
-    Writers = Field()
-    Runtime = Field()
-    Sinopsis = Field()
+    Synopsis = Field()
     Genres = Field()
-    MpaaRating = Field()
-    Budget = Field()
-    Language = Field()
-    Country = Field()
-
-    # technical details
-    GrossProfit = Field()
-    OpeningWeekendProfit = Field()
-    AspectRatio = Field()
-    SoundMix = Field()
-    Color = Field()
-
-    CastMembers = Field()
 
 
-class CastItem(Item):
-    ActorName = Field()
-    CharacterName = Field()
-    Ranking = Field() # this is howmany down they are from the top of the cast list.
