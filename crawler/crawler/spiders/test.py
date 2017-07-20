@@ -4,6 +4,8 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.exceptions import CloseSpider
 import pickle
 
+IMDB_URL = "http://imdb.com"
+
 class IMDBSpider(CrawlSpider):
     name = 'imdb'
     rules = (
