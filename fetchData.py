@@ -1,11 +1,18 @@
 from imdb import IMDb
-ia = IMDb()
+import pickle
 
 movie_ids = []
+filename = "crawler/ids/2010_2017.txt"
+with open(filename, 'rb') as f:
+    while 1:
+        try:
+            movie_ids.extend(pickle.load(f))
+        except EOFError:
+            break
 
-with open("crawler/ids/2016_2016.txt", 'r') as f:
-    movie_ids = f.read().splitlines()
+print len(movie_ids)
 
+ia = IMDb()
 for id in movie_ids:
     movie = ia.get_movie(id)
     ia.update(movie, ['synopsis', 'locations'])  # fetch the 'synopsis' and 'locations' data sets.

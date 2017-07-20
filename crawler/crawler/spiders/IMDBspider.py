@@ -2,6 +2,7 @@ import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from scrapy.exceptions import CloseSpider
+import pickle
 
 IMDB_URL = "http://imdb.com"
 
@@ -38,7 +39,7 @@ class IMDBSpider(CrawlSpider):
 
     def save_in_file(self, ids):
         with open("ids/" + self.filename, 'ab') as f:
-            f.writelines("%s\n" % id for id in ids)
+            pickle.dump(ids, f)
 
     parse_start_url = parse_page # make sure that the start_urls are parsed as well
 
