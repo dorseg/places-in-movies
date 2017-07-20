@@ -8,7 +8,7 @@ from crawler.items import MovieItem
 IMDB_URL = "http://imdb.com"
 
 class IMDBSpider(CrawlSpider):
-    name = 'imdb'
+    name = 'old'
     rules = (Rule(LinkExtractor(allow=(), restrict_xpaths=("//div[@class='nav']/div/a[@class='lister-page-next next-page']",)),
                   callback="parse_page", follow= True),)
 
@@ -27,10 +27,10 @@ class IMDBSpider(CrawlSpider):
             yield scrapy.Request('http://www.imdb.com/search/title?year={year},{year}&title_type=feature&sort=num_votes,desc'.format(year=year))
 
     def parse_page(self, response):
-        if self.passed_pages == self.total_pages:
-            raise CloseSpider("Reached page limit {}".format(self.total_pages))
-
         print "=====================parse_page================================"
+        if self.passed_pages == self.total_pages:
+            raise CloseSpider(colors.WARNING + "Reached page limit {}".format(self.total_pages) + colors.ENDC)
+
         content = response.xpath("//div[@class='lister-item-content']")
         paths = content.xpath("h3[@class='lister-item-header']/a/@href").extract() # list of paths of movies in the current page
 
@@ -55,9 +55,8 @@ class IMDBSpider(CrawlSpider):
     parse_start_url = parse_page
 
     def parse_movie_details(self, response):
-        print "=====================parse_movie_details================================"
+        print colors.BOLD + "=====================parse_movie_details================================" + colors.ENDC
         item = response.meta['item']
-        print item
         synopsis_url = response.xpath("//a[text()='Plot Synopsis']/@href").extract()
         url = item['MainPageUrl']
         title = response.xpath("//div[@class='titleBar']/div[@class='title_wrapper']/h1/text()").extract()[0][:-1]
