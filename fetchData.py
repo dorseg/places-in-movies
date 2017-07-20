@@ -29,7 +29,7 @@ def extract_ids(filename):
             except EOFError:
                 break
 
-    ids = [id[:-1] for id in ids] # remove last character
+    #ids = [id[:-1] for id in ids] # remove last character
     return ids
 
 
@@ -44,12 +44,10 @@ def main():
         print "Parse movie {}".format(id)
         ia.update(movie, ['synopsis', 'locations'])  # fetch the 'synopsis' and 'locations' data sets.
         synopsis = movie.get('synopsis')
-        print synopsis
-        if synopsis:
+        if not synopsis:
             print "No synopsis, continue..."
             continue
         title = movie.get('title')
-        #print "Movie name: {}".format(title)
         year = movie.get('year')
         genres = movie.get('genres')  # list of unicode strings
         directors = movie.get('director')
