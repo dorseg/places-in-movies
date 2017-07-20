@@ -3,6 +3,9 @@ ia = IMDb()
 
 movie_ids = []
 
+with open("crawler/ids/2016_2016.txt", 'r') as f:
+    movie_ids = f.read().splitlines()
+
 for id in movie_ids:
     movie = ia.get_movie(id)
     ia.update(movie, ['synopsis', 'locations'])  # fetch the 'synopsis' and 'locations' data sets.
