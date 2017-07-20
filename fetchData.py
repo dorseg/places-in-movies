@@ -3,7 +3,6 @@ import MovieDetails
 import json
 
 ia = IMDb()
-
 movie_ids = []
 
 with open("crawler/ids/2016_2016.txt", 'r') as f:
