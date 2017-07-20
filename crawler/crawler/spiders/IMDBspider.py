@@ -22,13 +22,11 @@ class IMDBSpider(CrawlSpider):
 
     # generate start_urls dynamically
     def start_requests(self):
-        print "=====================start_requests================================"
         yield scrapy.Request('http://www.imdb.com/search/title?year={},{}&title_type=feature&sort=num_votes,desc'.format(self.start_year, self.end_year))
 
     def parse_page(self, response):
-        print "=====================parse_page================================"
         if self.passed_pages == self.total_pages:
-            raise CloseSpider(colors.WARNING + "Reached page limit {}".format(self.total_pages) + colors.ENDC)
+            raise CloseSpider("Reached page limit {}".format(self.total_pages))
 
         content = response.xpath("//div[@class='lister-item-content']")
         paths = content.xpath("h3[@class='lister-item-header']/a/@href").extract()  # list of paths of movies in the current page
@@ -43,17 +41,6 @@ class IMDBSpider(CrawlSpider):
 
     parse_start_url = parse_page # make sure that the start_urls are parsed as well
 
-
-
-class colors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 
 

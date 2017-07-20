@@ -3,6 +3,9 @@ import pickle, json, sys
 
 PREFIX_URL = "www.imdb.com/title/tt"
 
+PARSED_MOVIES = 0
+TOTAL_MOVIES = 0
+
 class MovieDetails(object):
     """
     Store movie details
@@ -37,6 +40,8 @@ def extract_ids(filename):
 
 
 def save_in_json(details):
+    global PARSED_MOVIES
+    PARSED_MOVIES += 1
     with open("data/{}.txt".format(details.id), 'wb') as out:
         json.dump(details.__dict__, out)
 
@@ -50,12 +55,18 @@ def fix_loc(loc):
 
 
 def main():
+    global TOTAL_MOVIES
     filename = str(sys.argv[1]) + "_" + str(sys.argv[2]) + ".txt"
+    TOTAL_MOVIES = int(sys.argv[3])
     movie_ids = extract_ids("crawler/ids/{}".format(filename))
     print "Number of ids: ", len(movie_ids)
-
+    print "Start parsing {} movies...".format(TOTAL_MOVIES)
     ia = IMDb()
     for id in movie_ids:
+        if PARSED_MOVIES == TOTAL_MOVIES:
+            print "============== DONE =============="
+            break
+
         movie = ia.get_movie(id)
         print "Parse movie {}".format(id)
         ia.update(movie, ['synopsis', 'locations'])  # fetch the 'synopsis' and 'locations' data sets.
