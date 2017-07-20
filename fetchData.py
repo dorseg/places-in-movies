@@ -1,6 +1,6 @@
 from imdb import IMDb
 import pickle
-import MovieDetails
+from MovieDetails import MovieDetails
 import json
 
 ia = IMDb()
@@ -13,10 +13,13 @@ with open(filename, 'rb') as f:
         except EOFError:
             break
 
+movie_ids = [id[:-1] for id in movie_ids]
+
 print len(movie_ids)
 
 ia = IMDb()
 for id in movie_ids:
+    print "Parsing movie {}".format(id)
     movie = ia.get_movie(id)
     ia.update(movie, ['synopsis', 'locations'])  # fetch the 'synopsis' and 'locations' data sets.
     title = movie.get('title')
@@ -27,5 +30,5 @@ for id in movie_ids:
     filming_locations = [location[:location.find('::')] for location in movie.get('locations')] # list of names
     synopsis = movie.get('synopsis')
     movie_details = MovieDetails(title, year, genres, directors, rating, filming_locations, synopsis)
-    with open("data/{}.txt".format(id), 'w') as out:
+    with open("data/{}.txt".format(id), 'wb') as out:
         json.dump(movie_details, out)

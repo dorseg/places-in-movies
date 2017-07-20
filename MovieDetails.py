@@ -7,3 +7,5 @@ class MovieDetails(object):
         self._rating = rating
         self._filming_locations = filming_locations
         self._synopsis = synopsis
+
+    def __repr__(self):
