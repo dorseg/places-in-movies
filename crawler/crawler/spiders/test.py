@@ -3,8 +3,6 @@ from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from scrapy.exceptions import CloseSpider
 
-from crawler.items import MovieItem
-
 IMDB_URL = "http://imdb.com"
 
 class IMDBSpider(CrawlSpider):
