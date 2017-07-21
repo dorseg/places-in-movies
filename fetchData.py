@@ -62,13 +62,13 @@ def main():
     print "Number of ids: ", len(movie_ids)
     print "Start parsing {} movies...".format(TOTAL_MOVIES)
     ia = IMDb()
-    for id in movie_ids:
+    for i, id in enumerate(movie_ids):
         if PARSED_MOVIES == TOTAL_MOVIES:
             print "============== DONE =============="
             break
 
         movie = ia.get_movie(id)
-        print "Parse movie {}".format(id)
+        print "Parsing movie number {} with ID {}".format(i, id)
         ia.update(movie, ['synopsis', 'locations'])  # fetch the 'synopsis' and 'locations' data sets.
         synopsis = movie.get('synopsis')
         directors = movie.get('director') # list of Persons objects
