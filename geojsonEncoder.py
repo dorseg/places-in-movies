@@ -1,10 +1,23 @@
 import ner, json, geojson, os
 from opencage.geocoder import OpenCageGeocode
-from geojson import MultiPoint, Feature, FeatureCollection
+from geojson import Point, Feature, FeatureCollection
 
 # first, run:
 # java -mx1000m -cp stanford-ner.jar edu.stanford.nlp.ie.NERServer -loadClassifier classifiers/english.all.3class.distsim.crf.ser.gz -port 9191
 # in stanford ner tagger folder
+
+class GeoLocation(object):
+    """
+    Store GeoLocation details
+    """
+    def __init__(self, location, lng, lat):
+        self.location = location
+        self.lng = lng
+        self.lat = lat
+
+    def get_cords(self):
+        return self.lng, self.lat
+
 
 tagger = ner.SocketNER(host='localhost', port=9191, output_format='slashTags')
 key = '42bae5691544417f8d1a7922f8bc9d48'
@@ -13,13 +26,13 @@ geocoder = OpenCageGeocode(key)
 features = []
 
 def get_geolocation(loc):
-    cord = ()
+    geo = None
     result = geocoder.geocode(loc)
     if result and len(result):
         lng = result[0]['geometry']['lng']
         lat = result[0]["geometry"]['lat']
-        cord = (lng,lat)
-    return cord
+        geo = GeoLocation(loc,lng,lat)
+    return geo
 
 
 print "Start parsing..."
@@ -35,12 +48,21 @@ for file in files:
             continue
         locations = tagged_synopsis['LOCATION']
         locations = list(set(tagged_synopsis['LOCATION']))  # remove duplicates
-        geo_locations = filter(lambda cord: len(cord) > 0, map(get_geolocation, locations))
-        points = MultiPoint(geo_locations)
-        movie_details["synopsis_locations"] = locations
-        feature = Feature(geometry=points, properties=movie_details)
-        features.append(feature)
+        geolocations = filter(lambda x: x is not None, map(get_geolocation, locations))
+        if not geolocations:
+            print "No Geolocations, continue..."
+            continue
+        ignore_keys = ["filming_locations", "synopsis", "id"]
+        movie_details = {key: movie_details[key] for key in movie_details if key not in ignore_keys}
+        movie_details["marker-color"] = "0044FF"
+        movie_details["marker-symbol"] = "cinema"
+        for geo in geolocations:
+            movie_details["location"] = geo.location
+            point = Point(geo.get_cords())
+            feature = Feature(geometry=point, properties=movie_details)
+            features.append(feature)
 
+print "Created {} featurs".format(len(features))
 collection = FeatureCollection(features)
 with open("movies.geojson", 'w') as out:
     geojson.dump(collection, out)

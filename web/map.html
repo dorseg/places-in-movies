@@ -8,6 +8,8 @@
 <link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
 <!-- jQuery asset -->
 <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -17,34 +19,9 @@
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
 
-<style>
-#marker-list {
-  background:rgba(0,0,0,0.5);
-  position:absolute;
-  bottom:10px;
-  left:10px;
-  padding:5px 10px;
-  color:#fff;
-  font-size:11px;
-  line-height:18px;
-  border-radius:3px;
-  max-height:240px;
-  overflow:auto;
-  width:180px;
-  }
-#marker-list li {
-  padding:5px;
-  margin:0;
-  list-style-type:none;
-}
-#marker-list li:hover {
-  background:#339966;
-  cursor: pointer;
-}
-</style>
-
 <div id='map'></div>
 <ul id='marker-list'></ul>
+<input id='search' class='search-ui' placeholder='Enter a movie name' />
 <script src="script.js"></script>
 
 </body>
