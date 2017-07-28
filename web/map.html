@@ -8,42 +8,35 @@
 <link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
 <!-- jQuery asset -->
 <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-<style>
-  body { margin:0; padding:0; }
-  #map { position:absolute; top:0; bottom:0; width:100%; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
 
-
-
+<style>
+pre.ui-movies {
+  background:rgba(0,0,0,0.5);
+  position:absolute;
+  bottom:10px;
+  left:10px;
+  padding:5px 10px;
+  color:#fff;
+  font-size:11px;
+  line-height:18px;
+  border-radius:3px;
+  max-height:240px;
+  overflow:auto;
+  width:100px;
+  }
+</style>
 
 <div id='map'></div>
-<script>
-L.mapbox.accessToken = 'pk.eyJ1IjoiZG9yc2VnYWwiLCJhIjoiY2o1ZmUyaDJqMGV2ejM2bzEzb2IxcXBpMSJ9.RyTUESYcJTZ2J9mxH_A-1w';
+<pre id='movies' class='ui-movies'></pre>
+<script src="script.js"></script>
 
-var map = L.mapbox.map('map', 'mapbox.streets')
-  .setView([37.8, -96], 4)
-
-$.getJSON("example.geojson", function(data) {
-  var clusters = new L.MarkerClusterGroup();
-  var incidents = L.geoJson(data, {
-    pointToLayer: function(feature, latlng) {
-      var marker = L.marker(latlng);
-      marker.bindPopup('Fly tip reported on ');
-      return marker;
-    },
-    onEachFeature: function (feature, layer) {
-      layer.addTo(clusters);
-    }
-  });
-  map.addLayer(clusters);
-});
-
-</script>
 </body>
 </html>

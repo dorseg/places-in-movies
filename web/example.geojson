@@ -9,10 +9,7 @@
       },
       "properties": {
         "title": "Mapbox DC",
-        "description": "1714 14th St NW, Washington DC",
-        "marker-color": "#fc4353",
-        "marker-size": "large",
-        "marker-symbol": "monument"
+        "description": "1714 14th St NW, Washington DC"
       }
     },
     {
@@ -23,10 +20,7 @@
       },
       "properties": {
         "title": "Mapbox SF",
-        "description": "155 9th St, San Francisco",
-        "marker-color": "#fc4353",
-        "marker-size": "large",
-        "marker-symbol": "harbor"
+        "description": "155 9th St, San Francisco"
       }
     },
     {
@@ -56,10 +50,7 @@
         },
         "properties": {
         "title": "Mapbox SF",
-        "description": "155 9th St, San Francisco",
-        "marker-color": "#fc4353",
-        "marker-size": "large",
-        "marker-symbol": "cinema"
+        "description": "155 9th St, San Francisco"
       }
     }
 
