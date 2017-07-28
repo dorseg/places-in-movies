@@ -18,7 +18,7 @@
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
 
 <style>
-pre.ui-movies {
+#marker-list {
   background:rgba(0,0,0,0.5);
   position:absolute;
   bottom:10px;
@@ -32,10 +32,19 @@ pre.ui-movies {
   overflow:auto;
   width:180px;
   }
+#marker-list li {
+  padding:5px;
+  margin:0;
+  list-style-type:none;
+}
+#marker-list li:hover {
+  background:#339966;
+  cursor: pointer;
+}
 </style>
 
 <div id='map'></div>
-<pre id='movies' class='ui-movies'></pre>
+<ul id='marker-list'></ul>
 <script src="script.js"></script>
 
 </body>

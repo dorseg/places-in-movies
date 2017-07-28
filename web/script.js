@@ -1,7 +1,7 @@
 L.mapbox.accessToken = 'pk.eyJ1IjoiZG9yc2VnYWwiLCJhIjoiY2o1ZmUyaDJqMGV2ejM2bzEzb2IxcXBpMSJ9.RyTUESYcJTZ2J9mxH_A-1w';
 
 var map = L.mapbox.map('map', 'mapbox.streets')
-  .setView([37.8, -96], 4)
+  .setView([39.279806, 2.402989], 3);
 
 var clusters = new L.MarkerClusterGroup();
 $.getJSON("movies.geojson", function(data) {
@@ -31,20 +31,27 @@ $.getJSON("movies.geojson", function(data) {
   map.addLayer(clusters);
 });
 
+var markerList = document.getElementById('marker-list');
+
 function onmove() {
     // Get the map bounds - the top-left and bottom-right locations.
     var inBounds = [],
         bounds = map.getBounds();
+    markerList.innerHTML = "";
     clusters.eachLayer(function(marker) {
         var title = marker.options.title;
         // For each marker, consider whether it is currently visible by comparing
         // with the current map bounds.
         if (bounds.contains(marker.getLatLng()) && $.inArray(title, inBounds) == -1) {
             inBounds.push(title);
+            var item = markerList.appendChild(document.createElement('li'));
+            item.innerHTML = title;
+            item.onclick = function() {
+              map.setView(marker.getLatLng(), 10);
+              marker.openPopup();
+            };
         }
     });
-    // Display a list of markers.
-    document.getElementById('movies').innerHTML = inBounds.join('\n');
 }
 
 map.on('move', onmove);
