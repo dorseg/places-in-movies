@@ -34,9 +34,10 @@ for file in files:
             print "No locations, continue..."
             continue
         locations = tagged_synopsis['LOCATION']
-        locations = list(set(tagged_synopsis['LOCATION']))
+        locations = list(set(tagged_synopsis['LOCATION']))  # remove duplicates
         geo_locations = filter(lambda cord: len(cord) > 0, map(get_geolocation, locations))
         points = MultiPoint(geo_locations)
+        movie_details["synopsis_locations"] = locations
         feature = Feature(geometry=points, properties=movie_details)
         features.append(feature)
 
