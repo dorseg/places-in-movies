@@ -5,7 +5,7 @@ var map = L.mapbox.map('map', 'mapbox.streets')
 
 $('#search_title').keyup(search_title);
 $('#search_director').keyup(search_director);
-$('#search_genres').keyup(search_genres);
+$('#search_genre').keyup(search_genre);
 
 var markers = new L.MarkerClusterGroup();
 
@@ -117,11 +117,11 @@ function search_director() {
     }
 }
 
-function search_genres() {
+function search_genre() {
     // get the value of the search input field
-    var searchString = $('#search_genres').val().toLowerCase();
+    var searchString = $('#search_genre').val().toLowerCase();
 
-    geojsonLayer.setFilter(showGenres); // this will "hide" markers that do not match the filter.
+    geojsonLayer.setFilter(showGenre); // this will "hide" markers that do not match the filter.
     attachPopups();
     
     // replace the content of marker cluster group.
@@ -132,7 +132,7 @@ function search_genres() {
 
     // here we're simply comparing the 'state' property of each marker
     // to the search string, seeing whether the former contains the latter.
-    function showGenres(feature) {
+    function showGenre(feature) {
         var genres = feature.properties.genres;
         for (var i=0; i<genres.length; i++){
           if (genres[i].toLowerCase().indexOf(searchString) !== -1)
