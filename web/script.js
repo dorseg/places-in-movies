@@ -6,32 +6,6 @@ var map = L.mapbox.map('map', 'mapbox.streets')
 $('#search').keyup(search);
 
 var markers = new L.MarkerClusterGroup();
-// $.getJSON("movies.geojson", function(data) {
-//   var movies = L.geoJson(data, {
-//     pointToLayer: function(feature, latlng) {
-//       var properties = feature.properties;
-//       var coordinates = feature.geometry.coordinates;
-//       var cord_index = coordinates.findIndex(cords => cords[0]==latlng.lng && cords[1]==latlng.lat);
-//       var location = properties.synopsis_locations[cord_index];
-//       var title_with_year = properties.title + " (" + properties.year + ")"
-//       var marker = L.marker(latlng, {
-//             icon: L.mapbox.marker.icon({'marker-symbol': 'cinema', 'marker-color': '0044FF'}),
-//             title: title_with_year
-//         });
-//       marker.bindPopup("<center><b>" + title_with_year + "</b></center>" + 
-//                         "<b>Location:</b> " + location + '<br/>' +
-//                         "<b>Directors:</b> " + properties.directors + '<br/>' + 
-//                         "<b>Rating:</b> " + properties.rating + '<br/>' +
-//                         "<b>Genres:</b> " + properties.genres + '<br/>' +
-//                         "<a href=\"https://" + properties.url + "\" target=\"_blank\"><b>IMDB page</b></a>");
-//       return marker;
-//     },
-//     onEachFeature: function (feature, layer) {
-//       layer.addTo(clusters);
-//     }
-//   });
-//   map.addLayer(clusters);
-// });
 
 var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -106,7 +80,7 @@ function attachPopups() {
                         "<b>Directors:</b> " + properties.directors + '<br/>' + 
                         "<b>Rating:</b> " + properties.rating + '<br/>' +
                         "<b>Genres:</b> " + properties.genres + '<br/>' +
-                        "<a href=\"https://" + properties.url + "\" target=\"_blank\"><b>IMDB page</b></a>");
+                        "<a href=\"https://" + properties.url + "\" target=\"_blank\"><b>IMDb page</b></a>");
     });
 }
 
