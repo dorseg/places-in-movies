@@ -3,7 +3,9 @@ L.mapbox.accessToken = 'pk.eyJ1IjoiZG9yc2VnYWwiLCJhIjoiY2o1ZmUyaDJqMGV2ejM2bzEzb
 var map = L.mapbox.map('map', 'mapbox.streets')
   .setView([39.279806, 2.402989], 3);
 
-$('#search').keyup(search);
+$('#search_title').keyup(search_title);
+$('#search_director').keyup(search_director);
+$('#search_genres').keyup(search_genres);
 
 var markers = new L.MarkerClusterGroup();
 
@@ -53,8 +55,9 @@ function onmove() {
             link.className = 'title';
             link.innerHTML = title;
             link.onclick = function() {
-              setActive(item);
               map.setView(marker.getLatLng(), 10);
+
+              setActive(item);
               marker.openPopup();
             };
             // Marker interaction
@@ -68,9 +71,9 @@ function onmove() {
     });
 }
 
-function search() {
+function search_title() {
     // get the value of the search input field
-    var searchString = $('#search').val().toLowerCase();
+    var searchString = $('#search_title').val().toLowerCase();
 
     geojsonLayer.setFilter(showMovie); // this will "hide" markers that do not match the filter.
     attachPopups();
@@ -87,6 +90,54 @@ function search() {
         return feature.properties.title
             .toLowerCase()
             .indexOf(searchString) !== -1;
+    }
+}
+
+function search_director() {
+    // get the value of the search input field
+    var searchString = $('#search_director').val().toLowerCase();
+
+    geojsonLayer.setFilter(showDirector); // this will "hide" markers that do not match the filter.
+    attachPopups();
+    
+    // replace the content of marker cluster group.
+    markers.clearLayers();
+    markers.addLayer(geojsonLayer);
+
+    onmove();
+
+    // here we're simply comparing the 'state' property of each marker
+    // to the search string, seeing whether the former contains the latter.
+    function showDirector(feature) {
+        var directors = feature.properties.directors;
+        for (var i=0; i<directors.length; i++){
+          if (directors[i].toLowerCase().indexOf(searchString) !== -1)
+            return true;
+        }
+    }
+}
+
+function search_genres() {
+    // get the value of the search input field
+    var searchString = $('#search_genres').val().toLowerCase();
+
+    geojsonLayer.setFilter(showGenres); // this will "hide" markers that do not match the filter.
+    attachPopups();
+    
+    // replace the content of marker cluster group.
+    markers.clearLayers();
+    markers.addLayer(geojsonLayer);
+
+    onmove();
+
+    // here we're simply comparing the 'state' property of each marker
+    // to the search string, seeing whether the former contains the latter.
+    function showGenres(feature) {
+        var genres = feature.properties.genres;
+        for (var i=0; i<genres.length; i++){
+          if (genres[i].toLowerCase().indexOf(searchString) !== -1)
+            return true;
+        }
     }
 }
 
