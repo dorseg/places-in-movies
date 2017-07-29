@@ -18,9 +18,15 @@
 <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
 <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet'>
 
-<div id='map'></div>
-<ul id='marker-list'></ul>
+<div class='sidebar'>
+<div class='heading'>
+  <h1>Movies</h1>
+</div>
+<div id='listings' class='listings'></div>
+</div>
+<div id='map' class='map'></div>
 <input id='search' class='search-ui' placeholder='Enter a movie name' />
 <script src="script.js"></script>
 
