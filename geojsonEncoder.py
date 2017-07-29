@@ -15,6 +15,9 @@ class GeoLocation(object):
         self.lng = lng
         self.lat = lat
 
+    def __repr__(self):
+        return "(location: {}, lng: {}, lat: {})".format(self.location,self.lng,self.lat)
+
     def get_cords(self):
         return self.lng, self.lat
 
@@ -57,9 +60,11 @@ for file in files:
         movie_details["marker-color"] = "0044FF"
         movie_details["marker-symbol"] = "cinema"
         for geo in geolocations:
-            movie_details["location"] = geo.location
+            print geo
+            props = movie_details.copy()
+            props["location"] = geo.location
             point = Point(geo.get_cords())
-            feature = Feature(geometry=point, properties=movie_details)
+            feature = Feature(geometry=point, properties=props)
             features.append(feature)
 
 print "Created {} featurs".format(len(features))
