@@ -55,10 +55,9 @@ function onmove() {
             link.className = 'title';
             link.innerHTML = title;
             link.onclick = function() {
-              map.setView(marker.getLatLng(), 10);
-
+              filter_titles(marker.feature.properties.title);
+              map.fitBounds(geojsonLayer.getBounds());
               setActive(item);
-              marker.openPopup();
             };
             // Marker interaction
             marker.on('click', function(e) {
@@ -75,6 +74,10 @@ function search_title() {
     // get the value of the search input field
     var searchString = $('#search_title').val().toLowerCase();
 
+    filter_titles(searchString);
+}
+
+function filter_titles(query) {
     geojsonLayer.setFilter(showMovie); // this will "hide" markers that do not match the filter.
     attachPopups();
     
@@ -84,12 +87,10 @@ function search_title() {
 
     onmove();
 
-    // here we're simply comparing the 'state' property of each marker
-    // to the search string, seeing whether the former contains the latter.
     function showMovie(feature) {
         return feature.properties.title
             .toLowerCase()
-            .indexOf(searchString) !== -1;
+            .indexOf(query.toLowerCase()) !== -1;
     }
 }
 
