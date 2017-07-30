@@ -22,6 +22,12 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
 
 
 var markerList = document.getElementById('listings');
+var showAll = document.getElementById('show_all');
+
+showAll.onclick = function() {
+  filter_titles("");
+  map.fitBounds(geojsonLayer.getBounds());
+};
 
 function title_with_year(properties) {
   return properties.title + " (" + properties.year + ")";
