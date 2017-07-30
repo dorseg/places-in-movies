@@ -90,7 +90,7 @@ def main():
     encode_to_geojson(data_folder1)
     encode_to_geojson(data_folder2)
     print "Created {} featurs".format(len(features))
-    write_to_file(features)
+    write_to_file()
 
 
 if __name__ == '__main__':
