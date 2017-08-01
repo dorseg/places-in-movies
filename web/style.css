@@ -95,11 +95,7 @@ body {
   font-weight:700;
 }
 .listings .item .title small { font-weight:400; }
-.listings .item.active .title,
 .listings .item .title:hover { color:#8cc63f; }
-.listings .item.active {
-  background-color:#f8f8f8;
-}
 
 ::-webkit-scrollbar {
   width:3px;

@@ -11,23 +11,16 @@ var layers = {
     Satellite: L.mapbox.tileLayer('mapbox.satellite')
 };
 
-layers.Streets.addTo(map);
-L.control.layers(layers).addTo(map);
-
 $('#search_title').keyup(search_title);
 $('#search_director').keyup(search_director);
 $('#search_genre').keyup(search_genre);
 
-$('.menu-ui a').on('click', function() {
-    // For each filter link, get the 'data-filter' attribute value.
-    filter_titles("");
-    map.fitBounds(geojsonLayer.getBounds());
-    return false;
-});
-
+layers.Streets.addTo(map);
+L.control.layers(layers).addTo(map);
 
 var markers = new L.MarkerClusterGroup();
 var markers_size = 0;
+var polyline;
 
 var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -46,18 +39,27 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
 
 var markerList = document.getElementById('listings');
 
+$('.menu-ui a').on('click', function() {
+    // For each filter link, get the 'data-filter' attribute value.
+    polyline.remove();
+    $('#search_title').val('');
+    $('#search_director').val('');
+    $('#search_genre').val('');
+    filter_titles("");
+    map.fitBounds(geojsonLayer.getBounds());
+    return false;
+});
+
 function title_with_year(properties) {
   return properties.title + " (" + properties.year + ")";
 }
 
-function setActive(el) {
-  var siblings = markerList.getElementsByTagName('div');
-  for (var i = 0; i < siblings.length; i++) {
-    siblings[i].className = siblings[i].className
-    .replace(/active/, '').replace(/\s\s*$/, '');
-  }
-
-  el.className += ' active';
+function addPolyline(title) {
+    polyline = L.polyline([]).addTo(map);
+    geojsonLayer.eachLayer(function(marker) {
+        if (title == marker.feature.properties.title)
+        polyline.addLatLng(marker.getLatLng());
+    });
 }
 
 function onmove() {
@@ -81,16 +83,14 @@ function onmove() {
             link.className = 'title';
             link.innerHTML = title;
             link.onclick = function() {
-              filter_titles(marker.feature.properties.title);
-              map.fitBounds(geojsonLayer.getBounds());
-              setActive(item);
+                filter_titles(marker.feature.properties.title);
+                map.fitBounds(geojsonLayer.getBounds());
+                addPolyline(marker.feature.properties.title);
             };
             // Marker interaction
             marker.on('click', function(e) {
               // 1. center the map on the selected marker.
               map.panTo(marker.getLatLng());
-              // 2. Set active the markers associated listing.
-              setActive(item);
             });
         }
       }
