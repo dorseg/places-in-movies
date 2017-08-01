@@ -1,13 +1,33 @@
 L.mapbox.accessToken = 'pk.eyJ1IjoiZG9yc2VnYWwiLCJhIjoiY2o1ZmUyaDJqMGV2ejM2bzEzb2IxcXBpMSJ9.RyTUESYcJTZ2J9mxH_A-1w';
 
-var map = L.mapbox.map('map', 'mapbox.streets')
+var map = L.mapbox.map('map')
   .setView([39.279806, 2.402989], 3);
+
+var layers = {
+    Streets: L.mapbox.tileLayer('mapbox.streets'),
+    Outdoors: L.mapbox.tileLayer('mapbox.outdoors'),
+    Light: L.mapbox.tileLayer('mapbox.light'),
+    Dark: L.mapbox.tileLayer('mapbox.dark'),
+    Satellite: L.mapbox.tileLayer('mapbox.satellite')
+};
+
+layers.Streets.addTo(map);
+L.control.layers(layers).addTo(map);
 
 $('#search_title').keyup(search_title);
 $('#search_director').keyup(search_director);
 $('#search_genre').keyup(search_genre);
 
+$('.menu-ui a').on('click', function() {
+    // For each filter link, get the 'data-filter' attribute value.
+    filter_titles("");
+    map.fitBounds(geojsonLayer.getBounds());
+    return false;
+});
+
+
 var markers = new L.MarkerClusterGroup();
+var markers_size = 0;
 
 var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -18,16 +38,13 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
     markers.addLayer(geojsonLayer); // use the global variable markers.
     map.fitBounds(geojsonLayer.getBounds());
     markers.addTo(map);
+    markers.eachLayer(function(marker) {
+        markers_size++;
+    });
   });
 
 
 var markerList = document.getElementById('listings');
-var showAll = document.getElementById('show_all');
-
-showAll.onclick = function() {
-  filter_titles("");
-  map.fitBounds(geojsonLayer.getBounds());
-};
 
 function title_with_year(properties) {
   return properties.title + " (" + properties.year + ")";
@@ -48,11 +65,14 @@ function onmove() {
     var inBounds = [],
         bounds = map.getBounds();
     markerList.innerHTML = "";
+    var numOfBounds = 1;
     markers.eachLayer(function(marker) {
         var title = title_with_year(marker.feature.properties);
         // For each marker, consider whether it is currently visible by comparing
         // with the current map bounds.
-        if (bounds.contains(marker.getLatLng()) && $.inArray(title, inBounds) == -1) {
+        if (bounds.contains(marker.getLatLng())) {
+            numOfBounds++;
+            if ($.inArray(title, inBounds) == -1){
             inBounds.push(title);
             var item = markerList.appendChild(document.createElement('div'));
             item.className = 'item';
@@ -73,7 +93,12 @@ function onmove() {
               setActive(item);
             });
         }
+      }
     });
+    if (numOfBounds == markers_size){
+      $('.menu-ui a').removeClass('active');
+    }
+    else $('.menu-ui a').addClass('active');
 }
 
 function search_title() {
