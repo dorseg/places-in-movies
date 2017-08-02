@@ -11,23 +11,15 @@ var layers = {
     Satellite: L.mapbox.tileLayer('mapbox.satellite')
 };
 
+$('#search_title').keyup(search);
+$('#search_director').keyup(search);
+
 layers.Streets.addTo(map);
 L.control.layers(layers).addTo(map);
 
-$('#search_title').keyup(search_title);
-$('#search_director').keyup(search_director);
-$('#search_genre').keyup(search_genre);
-
-$('.menu-ui a').on('click', function() {
-    // For each filter link, get the 'data-filter' attribute value.
-    filter_titles("");
-    map.fitBounds(geojsonLayer.getBounds());
-    return false;
-});
-
-
 var markers = new L.MarkerClusterGroup();
 var markers_size = 0;
+var polyline = null;
 
 var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -45,19 +37,38 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
 
 
 var markerList = document.getElementById('listings');
+var genre_filters = document.getElementById('genre_filters');
+var genre_checkboxes = document.getElementsByClassName('filter');
+var on_genres = [];
+
+$('.genrebtn').on('click', function() {
+    document.getElementById("filters").classList.toggle("show");
+});
+
+
+$('.menu-ui a').on('click', function() {
+    // For each filter link, get the 'data-filter' attribute value.
+    if (polyline != null){
+        polyline.remove();
+    }
+    $('#search_title').val('');
+    $('#search_director').val('');
+    check_genres();
+    filter_by("","",on_genres);
+    map.fitBounds(geojsonLayer.getBounds());
+    return false;
+});
 
 function title_with_year(properties) {
   return properties.title + " (" + properties.year + ")";
 }
 
-function setActive(el) {
-  var siblings = markerList.getElementsByTagName('div');
-  for (var i = 0; i < siblings.length; i++) {
-    siblings[i].className = siblings[i].className
-    .replace(/active/, '').replace(/\s\s*$/, '');
-  }
-
-  el.className += ' active';
+function addPolyline(title) {
+    polyline = L.polyline([]).addTo(map);
+    geojsonLayer.eachLayer(function(marker) {
+        if (title == marker.feature.properties.title)
+        polyline.addLatLng(marker.getLatLng());
+    });
 }
 
 function onmove() {
@@ -81,16 +92,13 @@ function onmove() {
             link.className = 'title';
             link.innerHTML = title;
             link.onclick = function() {
-              filter_titles(marker.feature.properties.title);
-              map.fitBounds(geojsonLayer.getBounds());
-              setActive(item);
+                filter_by(marker.feature.properties.title, "", on_genres);
+                map.fitBounds(geojsonLayer.getBounds());
+                addPolyline(marker.feature.properties.title);
             };
             // Marker interaction
             marker.on('click', function(e) {
-              // 1. center the map on the selected marker.
               map.panTo(marker.getLatLng());
-              // 2. Set active the markers associated listing.
-              setActive(item);
             });
         }
       }
@@ -101,15 +109,16 @@ function onmove() {
     else $('.menu-ui a').addClass('active');
 }
 
-function search_title() {
+function search() {
     // get the value of the search input field
-    var searchString = $('#search_title').val().toLowerCase();
+    var title = $('#search_title').val().toLowerCase();
+    var director = $('#search_director').val().toLowerCase();
 
-    filter_titles(searchString);
+    filter_by(title, director, on_genres);
 }
 
-function filter_titles(query) {
-    geojsonLayer.setFilter(showMovie); // this will "hide" markers that do not match the filter.
+function filter_by(title, director, genres) {
+    geojsonLayer.setFilter(filter_feature); // this will "hide" markers that do not match the filter.
     attachPopups();
     
     // replace the content of marker cluster group.
@@ -118,59 +127,41 @@ function filter_titles(query) {
 
     onmove();
 
-    function showMovie(feature) {
-        return feature.properties.title
-            .toLowerCase()
-            .indexOf(query.toLowerCase()) !== -1;
+    function filter_feature(feature){
+        return showMovie(feature, title) && showDirector(feature, director) && showGenres(feature, genres); 
     }
 }
 
-function search_director() {
-    // get the value of the search input field
-    var searchString = $('#search_director').val().toLowerCase();
+function showMovie(feature, query) {
+    return feature.properties.title
+        .toLowerCase()
+        .indexOf(query.toLowerCase()) !== -1;
+}
 
-    geojsonLayer.setFilter(showDirector); // this will "hide" markers that do not match the filter.
-    attachPopups();
-    
-    // replace the content of marker cluster group.
-    markers.clearLayers();
-    markers.addLayer(geojsonLayer);
+function showDirector(feature, query) {
+    var directors = feature.properties.directors;
+    for (var i=0; i<directors.length; i++){
+      if (directors[i].toLowerCase().indexOf(query) !== -1)
+        return true;
+    }
+    return false;
+}
 
-    onmove();
-
-    // here we're simply comparing the 'state' property of each marker
-    // to the search string, seeing whether the former contains the latter.
-    function showDirector(feature) {
-        var directors = feature.properties.directors;
-        for (var i=0; i<directors.length; i++){
-          if (directors[i].toLowerCase().indexOf(searchString) !== -1)
-            return true;
+function showGenres(feature, on) {
+    var genres = feature.properties.genres;
+    for (var i=0; i<genres.length; i++){
+        var found = false;
+        for (var j=0; j<on.length; j++){
+            if (genres[i].toLowerCase() == on[j].toLowerCase()){
+                found = true;
+                break;
+            }
+        }
+        if (!found){
+            return false;
         }
     }
-}
-
-function search_genre() {
-    // get the value of the search input field
-    var searchString = $('#search_genre').val().toLowerCase();
-
-    geojsonLayer.setFilter(showGenre); // this will "hide" markers that do not match the filter.
-    attachPopups();
-    
-    // replace the content of marker cluster group.
-    markers.clearLayers();
-    markers.addLayer(geojsonLayer);
-
-    onmove();
-
-    // here we're simply comparing the 'state' property of each marker
-    // to the search string, seeing whether the former contains the latter.
-    function showGenre(feature) {
-        var genres = feature.properties.genres;
-        for (var i=0; i<genres.length; i++){
-          if (genres[i].toLowerCase().indexOf(searchString) !== -1)
-            return true;
-        }
-    }
+    return true;
 }
 
 // Need a function because it looks like .setFilter() removes the popup…
@@ -188,6 +179,25 @@ function attachPopups() {
                         "<a href=\"https://" + properties.url + "\" target=\"_blank\"><b>IMDb page</b></a>");
     });
 }
+
+function change() {
+    on_genres = [];
+    for (var i = 0; i < genre_checkboxes.length; i++) {
+        if (genre_checkboxes[i].checked) on_genres.push(genre_checkboxes[i].value);
+    }
+
+    search();
+    return false;
+}
+
+function check_genres(){
+    for (var i = 0; i < genre_checkboxes.length; i++) {
+        genre_checkboxes[i].checked = 'checked';
+    }
+    change();
+}
+
+genre_filters.onchange = change;
 
 map.on('move', onmove);
 
