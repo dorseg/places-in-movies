@@ -39,10 +39,17 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
 
 var markerList = document.getElementById('listings');
 var genre_filters = document.getElementById('genre_filters');
-var genre_checkboxes = document.getElementsByClassName('filter');
+var genre_checkboxes = document.getElementsByClassName('genre_filter');
 var on_genres = [];
+var years_filters = document.getElementById('years_filters');
+var years_checkboxes = document.getElementsByClassName('years_filter');
+var on_years = [];
 
 $('.genrebtn').on('click', function() {
+    document.getElementById("filters").classList.toggle("show");
+});
+
+$('.yearsbtn').on('click', function() {
     document.getElementById("filters").classList.toggle("show");
 });
 
@@ -58,7 +65,8 @@ $('.menu-ui a').on('click', function() {
     $('#search_title').val('');
     $('#search_director').val('');
     check_genres();
-    filter_by("","",on_genres);
+    check_years();
+    filter_by("","",on_genres, on_years);
     map.fitBounds(geojsonLayer.getBounds());
     return false;
 });
@@ -142,7 +150,7 @@ function search() {
     var title = $('#search_title').val().toLowerCase();
     var director = $('#search_director').val().toLowerCase();
 
-    filter_by(title, director, on_genres);
+    filter_by(title, director, on_genres, on_years);
 
     // if (polyline!= null){
     //     polyline.remove();
@@ -152,7 +160,7 @@ function search() {
     }
 }
 
-function filter_by(title, director, genres) {
+function filter_by(title, director, genres, years) {
     geojsonLayer.setFilter(filter_feature); // this will "hide" markers that do not match the filter.
     attachPopups();
     
@@ -163,7 +171,7 @@ function filter_by(title, director, genres) {
     onmove();
 
     function filter_feature(feature){
-        return showMovie(feature, title) && showDirector(feature, director) && showGenres(feature, genres); 
+        return showMovie(feature, title) && showDirector(feature, director) && showGenres(feature, genres) && showYears(feature, years); 
     }
 }
 
@@ -199,6 +207,20 @@ function showGenres(feature, on) {
     return true;
 }
 
+function showYears(feature, on) {
+    var year = feature.properties.year;
+    for (var i=0; i<on.length; i++){
+        var decade = on[i];
+        var year_bounds = decade.split("-");
+        year_bounds[0] = parseInt(year_bounds[0]);
+        year_bounds[1] = parseInt(year_bounds[1]);
+        if (year >= year_bounds[0] && year <= year_bounds[1]){
+            return true;
+        }
+    }
+    return false;
+}
+
 // Need a function because it looks like .setFilter() removes the popup…
 function attachPopups() {
   // Create popups.
@@ -215,7 +237,7 @@ function attachPopups() {
     });
 }
 
-function change() {
+function change_genres() {
     on_genres = [];
     for (var i = 0; i < genre_checkboxes.length; i++) {
         if (genre_checkboxes[i].checked) on_genres.push(genre_checkboxes[i].value);
@@ -228,14 +250,33 @@ function check_genres(){
     for (var i = 0; i < genre_checkboxes.length; i++) {
         genre_checkboxes[i].checked = 'checked';
     }
-    change();
+    change_genres();
 }
 
-genre_filters.onchange = change;
+genre_filters.onchange = change_genres;
+
+function change_years() {
+    on_years = [];
+    for (var i = 0; i < years_checkboxes.length; i++) {
+        if (years_checkboxes[i].checked) on_years.push(years_checkboxes[i].value);
+    }
+    search();
+    return false;
+}
+
+function check_years(){
+    for (var i = 0; i < years_checkboxes.length; i++) {
+        years_checkboxes[i].checked = 'checked';
+    }
+    change_years();
+}
+
+years_filters.onchange = change_years;
 
 map.on('move', onmove);
 
 // call onmove off the bat so that the list is populated.
 // otherwise, there will be no markers listed until the map is moved.
 onmove();
-change();
+change_genres();
+change_years();

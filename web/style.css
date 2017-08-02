@@ -156,4 +156,34 @@ body {
 .genre_dropdown:hover .genre-content {
     display: block;
 }
+.yearsbtn {
+  background:#fff;
+  position:absolute;
+  top:170px;right:10px;
+  z-index:1;
+  border-radius:3px;
+  width:120px;
+  border:1px solid rgba(0,0,0,0.4);
+}
+/* Dropdown button on hover & focus */
+.yearsbtn:hover, .yearsbtn:focus {
+      background:#f8f8f8;
+      color:#404040;
+}
 
+/* Dropdown Content (Hidden by Default) */
+.years-content {
+  display: none;
+  background:#fff;
+  position:absolute;
+  top:170px;right:10px;
+  width:130px;
+  z-index:100;
+  padding:10px;
+  border-radius:3px;
+  }
+
+/* Show the dropdown menu on hover */
+.years_dropdown:hover .years-content {
+    display: block;
+}
