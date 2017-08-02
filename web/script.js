@@ -106,6 +106,19 @@ function addPolyline(title) {
     hull.addTo(map);
 }
 
+function isTitleInArray(title, items){
+    for (var i=0; i<items.length; i++){
+        item = items[i];
+        var link = item.childNodes[0];
+        var link_title = link.innerHTML;
+        if (title == link_title){
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
 function onmove() {
     // Get the map bounds - the top-left and bottom-right locations.
     var inBounds = [],
@@ -118,26 +131,33 @@ function onmove() {
         // with the current map bounds.
         if (bounds.contains(marker.getLatLng())) {
             numOfBounds++;
-            if ($.inArray(title, inBounds) == -1){
-            inBounds.push(title);
-            var item = markerList.appendChild(document.createElement('div'));
-            item.className = 'item';
-            var link = item.appendChild(document.createElement('a'));
-            link.href = '#';
-            link.className = 'title';
-            link.innerHTML = title;
-            link.onclick = function() {
-                $('#search_title').val(marker.feature.properties.title);
-                search();
-                map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
-                addPolyline(marker.feature.properties.title);
-            };
-            // Marker interaction
-            marker.on('click', function(e) {
-              map.panTo(marker.getLatLng());
-            });
+            if (isTitleInArray(title, inBounds) == false){
+                var item = document.createElement('div');
+                item.className = 'item';
+                var link = item.appendChild(document.createElement('a'));
+                link.href = '#';
+                link.className = 'title';
+                link.innerHTML = title;
+                item.setAttribute('sort_by', marker.feature.properties.title.toLowerCase());
+                link.onclick = function() {
+                    $('#search_title').val(marker.feature.properties.title);
+                    search();
+                    map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
+                    addPolyline(marker.feature.properties.title);
+                };
+                // Marker interaction
+                marker.on('click', function(e) {
+                  map.panTo(marker.getLatLng());
+                });
+                inBounds.push(item);
+            }
         }
-      }
+    });
+    inBounds.sort(function(a, b) {
+        return a.getAttribute('sort_by').localeCompare(b.getAttribute('sort_by'));
+    });
+    inBounds.forEach(function(item) {
+        markerList.appendChild(item);
     });
     if (numOfBounds == markers_size){
       $('.menu-ui a').removeClass('active');
