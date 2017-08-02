@@ -1,0 +1,1 @@
+{"date_birth": null, "name": "Rob Letterman", "url": "http://dbpedia.org/resource/Rob_Letterman", "gender": "male", "movies": ["Monsters vs. Aliens", "Goosebumps", "Shark Tale", "Los Gringos", "Gulliver's Travels"], "photo": "http://commons.wikimedia.org/wiki/Special:FilePath/Rob_Letterman,_SDCC_2014-2_(cropped).jpg?width=300", "places_birth": ["United_States", "Hawaii"]}
