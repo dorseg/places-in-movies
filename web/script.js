@@ -13,7 +13,6 @@ var layers = {
 
 $('#search_title').keyup(search);
 $('#search_director').keyup(search);
-$('#search_genre').keyup(search);
 
 layers.Streets.addTo(map);
 L.control.layers(layers).addTo(map);
@@ -38,6 +37,14 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
 
 
 var markerList = document.getElementById('listings');
+var genre_filters = document.getElementById('genre_filters');
+var genre_checkboxes = document.getElementsByClassName('filter');
+var on_genres = [];
+
+$('.genrebtn').on('click', function() {
+    document.getElementById("filters").classList.toggle("show");
+});
+
 
 $('.menu-ui a').on('click', function() {
     // For each filter link, get the 'data-filter' attribute value.
@@ -46,8 +53,8 @@ $('.menu-ui a').on('click', function() {
     }
     $('#search_title').val('');
     $('#search_director').val('');
-    $('#search_genre').val('');
-    filter_by("","","");
+    check_genres();
+    filter_by("","",on_genres);
     map.fitBounds(geojsonLayer.getBounds());
     return false;
 });
@@ -85,13 +92,12 @@ function onmove() {
             link.className = 'title';
             link.innerHTML = title;
             link.onclick = function() {
-                filter_by(marker.feature.properties.title, "", "");
+                filter_by(marker.feature.properties.title, "", on_genres);
                 map.fitBounds(geojsonLayer.getBounds());
                 addPolyline(marker.feature.properties.title);
             };
             // Marker interaction
             marker.on('click', function(e) {
-              // 1. center the map on the selected marker.
               map.panTo(marker.getLatLng());
             });
         }
@@ -107,12 +113,11 @@ function search() {
     // get the value of the search input field
     var title = $('#search_title').val().toLowerCase();
     var director = $('#search_director').val().toLowerCase();
-    var genre = $('#search_genre').val().toLowerCase();
 
-    filter_by(title, director, genre);
+    filter_by(title, director, on_genres);
 }
 
-function filter_by(title, director, genre) {
+function filter_by(title, director, genres) {
     geojsonLayer.setFilter(filter_feature); // this will "hide" markers that do not match the filter.
     attachPopups();
     
@@ -123,7 +128,7 @@ function filter_by(title, director, genre) {
     onmove();
 
     function filter_feature(feature){
-        return showMovie(feature, title) && showDirector(feature, director) && showGenre(feature, genre); 
+        return showMovie(feature, title) && showDirector(feature, director) && showGenres(feature, genres); 
     }
 }
 
@@ -139,14 +144,24 @@ function showDirector(feature, query) {
       if (directors[i].toLowerCase().indexOf(query) !== -1)
         return true;
     }
+    return false;
 }
 
-function showGenre(feature, query) {
+function showGenres(feature, on) {
     var genres = feature.properties.genres;
     for (var i=0; i<genres.length; i++){
-      if (genres[i].toLowerCase().indexOf(query) !== -1)
-        return true;
+        var found = false;
+        for (var j=0; j<on.length; j++){
+            if (genres[i].toLowerCase() == on[j].toLowerCase()){
+                found = true;
+                break;
+            }
+        }
+        if (!found){
+            return false;
+        }
     }
+    return true;
 }
 
 // Need a function because it looks like .setFilter() removes the popup…
@@ -164,6 +179,25 @@ function attachPopups() {
                         "<a href=\"https://" + properties.url + "\" target=\"_blank\"><b>IMDb page</b></a>");
     });
 }
+
+function change() {
+    on_genres = [];
+    for (var i = 0; i < genre_checkboxes.length; i++) {
+        if (genre_checkboxes[i].checked) on_genres.push(genre_checkboxes[i].value);
+    }
+
+    search();
+    return false;
+}
+
+function check_genres(){
+    for (var i = 0; i < genre_checkboxes.length; i++) {
+        genre_checkboxes[i].checked = 'checked';
+    }
+    change();
+}
+
+genre_filters.onchange = change;
 
 map.on('move', onmove);
 
