@@ -65,8 +65,9 @@ def encode_to_geojson(data_folder):
             if not geolocations:
                 print "No Geolocations, continue..."
                 continue
-            ignore_keys = ["filming_locations", "synopsis", "id"]
+            ignore_keys = ["filming_locations", "synopsis"]
             movie_details = {key: movie_details[key] for key in movie_details if key not in ignore_keys}
+            movie_details["num_of_locations"] = len(geolocations);
             movie_details["marker-color"] = "0044FF"
             movie_details["marker-symbol"] = "cinema"
             for geo in geolocations:

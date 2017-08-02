@@ -126,8 +126,9 @@ function onmove() {
     markerList.innerHTML = "";
     var numOfBounds = 1;
     markers.eachLayer(function(marker) {
-        var title = marker.feature.properties.title;
-        var title_with_year = get_title_with_year(marker.feature.properties);
+        var props = marker.feature.properties;
+        var title = props.title;
+        var title_with_year = get_title_with_year(props);
         // For each marker, consider whether it is currently visible by comparing
         // with the current map bounds.
         if (bounds.contains(marker.getLatLng())) {
@@ -140,6 +141,9 @@ function onmove() {
                 link.className = 'title';
                 link.innerHTML = title_with_year;
                 item.setAttribute('sort_by', title.toLowerCase());
+                var details = item.appendChild(document.createElement('div'));
+                console.log(props.num_of_locations);
+                details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
                 link.onclick = function() {
                     $('#search_title').val(title);
                     search();
