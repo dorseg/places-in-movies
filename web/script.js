@@ -92,7 +92,8 @@ function onmove() {
             link.className = 'title';
             link.innerHTML = title;
             link.onclick = function() {
-                filter_by(marker.feature.properties.title, "", on_genres);
+                $('#search_title').val(marker.feature.properties.title);
+                search();
                 map.fitBounds(geojsonLayer.getBounds());
                 addPolyline(marker.feature.properties.title);
             };
@@ -185,7 +186,9 @@ function change() {
     for (var i = 0; i < genre_checkboxes.length; i++) {
         if (genre_checkboxes[i].checked) on_genres.push(genre_checkboxes[i].value);
     }
-
+    if (polyline!= null){
+        polyline.remove();
+    }
     search();
     return false;
 }
