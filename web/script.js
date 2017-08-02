@@ -71,7 +71,7 @@ $('.menu-ui a').on('click', function() {
     return false;
 });
 
-function title_with_year(properties) {
+function get_title_with_year(properties) {
   return properties.title + " (" + properties.year + ")";
 }
 
@@ -126,24 +126,25 @@ function onmove() {
     markerList.innerHTML = "";
     var numOfBounds = 1;
     markers.eachLayer(function(marker) {
-        var title = title_with_year(marker.feature.properties);
+        var title = marker.feature.properties.title;
+        var title_with_year = get_title_with_year(marker.feature.properties);
         // For each marker, consider whether it is currently visible by comparing
         // with the current map bounds.
         if (bounds.contains(marker.getLatLng())) {
             numOfBounds++;
-            if (isTitleInArray(title, inBounds) == false){
+            if (isTitleInArray(title_with_year, inBounds) == false){
                 var item = document.createElement('div');
                 item.className = 'item';
                 var link = item.appendChild(document.createElement('a'));
                 link.href = '#';
                 link.className = 'title';
-                link.innerHTML = title;
-                item.setAttribute('sort_by', marker.feature.properties.title.toLowerCase());
+                link.innerHTML = title_with_year;
+                item.setAttribute('sort_by', title.toLowerCase());
                 link.onclick = function() {
-                    $('#search_title').val(marker.feature.properties.title);
+                    $('#search_title').val(title);
                     search();
                     map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
-                    addPolyline(marker.feature.properties.title);
+                    addPolyline(title);
                 };
                 // Marker interaction
                 marker.on('click', function(e) {
@@ -247,7 +248,7 @@ function attachPopups() {
     geojsonLayer.eachLayer(function (layer) {
       var feature = layer.feature;
       var properties = feature.properties;
-      var title = title_with_year(properties);
+      var title = get_title_with_year(properties);
       layer.bindPopup("<center><b>" + title + "</b></center>" + 
                         "<b>Location:</b> " + properties.location + '<br/>' +
                         "<b>Directors:</b> " + properties.directors + '<br/>' + 
