@@ -19,7 +19,8 @@ L.control.layers(layers).addTo(map);
 
 var markers = new L.MarkerClusterGroup();
 var markers_size = 0;
-var polyline = null;
+//var polyline = null;
+var hull = null;
 
 var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -48,8 +49,11 @@ $('.genrebtn').on('click', function() {
 
 $('.menu-ui a').on('click', function() {
     // For each filter link, get the 'data-filter' attribute value.
-    if (polyline != null){
-        polyline.remove();
+    // if (polyline != null){
+    //     polyline.remove();
+    // }
+    if (hull != null){
+        map.removeLayer(hull);
     }
     $('#search_title').val('');
     $('#search_director').val('');
@@ -64,11 +68,34 @@ function title_with_year(properties) {
 }
 
 function addPolyline(title) {
-    polyline = L.polyline([]).addTo(map);
+    // polyline = L.polyline([]).addTo(map);
+    // geojsonLayer.eachLayer(function(marker) {
+    //     if (title == marker.feature.properties.title)
+    //         polyline.addLatLng(marker.getLatLng());
+    // });
+    var markers_features = [];
+    var markers_cord = [];
     geojsonLayer.eachLayer(function(marker) {
         if (title == marker.feature.properties.title)
-        polyline.addLatLng(marker.getLatLng());
+            markers_features.push(marker.toGeoJSON());
+            markers_cord.push(marker.getLatLng());
     });
+
+    if (markers_features.length < 3){
+        hull = L.polyline([]).addTo(map);
+        for (var i=0; i<markers_cord.length; i++){
+            hull.addLatLng(markers_cord[i]);
+        }
+        return;
+    }
+
+    var collection = {
+        type: 'FeatureCollection',
+        features: markers_features
+    };
+
+    hull = L.mapbox.featureLayer(turf.convex(collection));
+    hull.addTo(map);
 }
 
 function onmove() {
@@ -94,7 +121,7 @@ function onmove() {
             link.onclick = function() {
                 $('#search_title').val(marker.feature.properties.title);
                 search();
-                map.fitBounds(geojsonLayer.getBounds());
+                map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
                 addPolyline(marker.feature.properties.title);
             };
             // Marker interaction
@@ -116,6 +143,13 @@ function search() {
     var director = $('#search_director').val().toLowerCase();
 
     filter_by(title, director, on_genres);
+
+    // if (polyline!= null){
+    //     polyline.remove();
+    // }
+    if (hull != null){
+        map.removeLayer(hull);
+    }
 }
 
 function filter_by(title, director, genres) {
@@ -186,9 +220,6 @@ function change() {
     for (var i = 0; i < genre_checkboxes.length; i++) {
         if (genre_checkboxes[i].checked) on_genres.push(genre_checkboxes[i].value);
     }
-    if (polyline!= null){
-        polyline.remove();
-    }
     search();
     return false;
 }
@@ -207,3 +238,4 @@ map.on('move', onmove);
 // call onmove off the bat so that the list is populated.
 // otherwise, there will be no markers listed until the map is moved.
 onmove();
+change();
