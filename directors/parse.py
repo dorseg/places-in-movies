@@ -9,6 +9,7 @@ def parse_directors(data_dir):
     """
     names = []
     for filename in os.listdir(data_dir):
+        print "Parsing the file {}...".format(filename)
         name = get_director_name(data_dir + '/' + filename)
         names.extend(name)
     return names
@@ -36,7 +37,7 @@ def main():
     data_dir = sys.argv[1]
     print "Start parsing data from the directory:", data_dir
     directors = parse_directors(data_dir)
-    save_in_file("directors_names", directors)
+    save_in_file("directors_names.txt", directors)
     print "DONE"
 
 if __name__ == "__main__":
