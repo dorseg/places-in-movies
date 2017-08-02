@@ -110,6 +110,7 @@ def make_director(name, res):
 def fix_places(places):
     places = list(set(places)) # remove duplicates
     places = [place[place.rfind('/')+1:len(place)] for place in places] # only the name
+    places = [place.replace('_', ' ') for place in places]
     return places
 
 
