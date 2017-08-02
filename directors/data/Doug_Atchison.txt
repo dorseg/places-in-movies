@@ -1,1 +1,1 @@
-{"photo": null, "date_birth": null, "name": "Doug Atchison", "url": "http://dbpedia.org/resource/Doug_Atchison", "imdbId": null, "movies": ["Akeelah and the Bee"], "gender": "male", "places_birth": []}
+{"date_birth": null, "name": "Doug Atchison", "url": "http://dbpedia.org/resource/Doug_Atchison", "gender": "male", "movies": ["Akeelah and the Bee"], "photo": null, "places_birth": []}

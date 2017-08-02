@@ -8,7 +8,6 @@ class Director(object):
     """
     def __init__(self, name):
         self.name = name
-        self.imdbId = None
         self.url = None
         self.date_birth = None
         self.places_birth = []
@@ -18,14 +17,13 @@ class Director(object):
 
     def __str__(self):
         name = "name: " + str(self.name)
-        imdbId = "imdbId: " + str(self.imdbId)
         url = "url: " + str(self.url)
         date_birth = "date_birth: " + str(self.date_birth)
         places_birth = "places_birth: " + str(self.places_birth)
         gender = "gender: " + str(self.gender)
         movies = "movies: " + str(self.movies)
         photo = "photo: " + str(self.photo)
-        return "\n".join([name, imdbId, url, date_birth, places_birth, gender, movies, photo])
+        return "\n".join([name, url, date_birth, places_birth, gender, movies, photo])
 
 
 def extract_directors_names(filename):
@@ -64,11 +62,10 @@ def make_director_query(director_name):
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX yago: <http://dbpedia.org/class/yago/>
 
-            SELECT DISTINCT ?url ?dateBirth ?placeBirth ?gender ?movie ?photo ?imdbId
+            SELECT DISTINCT ?url ?dateBirth ?placeBirth ?gender ?movie ?photo
                 WHERE {{
                      ?url foaf:name "{}"@en .
                      ?url a yago:FilmMaker110088390.
-                     OPTIONAL {{ ?url       dbo:imdbId ?imdbId            }}.
                      OPTIONAL {{ ?url       dbo:birthDate  ?dateBirth     }}.
                      OPTIONAL {{ ?url       dbo:birthPlace ?placeBirth    }}.
                      OPTIONAL {{ ?url       dbo:deathPlace ?placeDeat     }}.
@@ -93,8 +90,6 @@ def make_director(name, res):
             if var_res:
                 if var == "url":
                     ans.url = var_res["value"]
-                if var == "imdbId":
-                    ans.imdbId = var_res["value"]
                 elif var == "dateBirth":
                     ans.date_birth = var_res["value"]
                 elif var == "placeBirth":
@@ -105,10 +100,18 @@ def make_director(name, res):
                     ans.movies.append(var_res["value"])
                 elif var == "photo":
                     ans.photo = var_res["value"]
-    # remove duplicates
-    ans.places_birth = list(set(ans.places_birth))
+
+    ans.places_birth = fix_places(ans.places_birth)
     ans.movies = list(set(ans.movies))
+
     return ans
+
+
+def fix_places(places):
+    places = list(set(places)) # remove duplicates
+    places = [place[place.rfind('/')+1:len(place)] for place in places] # only the name
+    places = [place.replace('_', ' ') for place in places]
+    return places
 
 
 # debug
@@ -146,14 +149,14 @@ def main():
         q = make_director_query(name)
         res = runquery(q)
         director = make_director(name, res)
-        # print director
+        print director
         if director: # can be None if no results found
             save_in_json(director)
             count += 1
         print " =========== "
     print "DONE with {} directors".format(count)
 
-    # test("John Pogue")
+     # test("Christopher Nolan")
 
 if __name__ == "__main__":
     main()
