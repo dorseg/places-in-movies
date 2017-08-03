@@ -39,10 +39,14 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
 
 var markerList = document.getElementById('listings');
 var genre_filters = document.getElementById('genre_filters');
-var genre_checkboxes = document.getElementsByClassName('genre_filter');
+var genre_checkall = document.getElementById('check_all_genres');
+var genre_uncheckall = document.getElementById('uncheck_all_genres');
+var genres_checkboxes = document.getElementsByClassName('genre_filter');
 var on_genres = [];
 var years_filters = document.getElementById('years_filters');
 var years_checkboxes = document.getElementsByClassName('years_filter');
+var years_checkall = document.getElementById('check_all_years');
+var years_uncheckall = document.getElementById('uncheck_all_years');
 var on_years = [];
 
 $('.genrebtn').on('click', function() {
@@ -64,8 +68,8 @@ $('.menu-ui a').on('click', function() {
     }
     $('#search_title').val('');
     $('#search_director').val('');
-    check_genres();
-    check_years();
+    check_all_genres();
+    check_all_years();
     filter_by("","",on_genres, on_years);
     map.fitBounds(geojsonLayer.getBounds());
     return false;
@@ -76,11 +80,6 @@ function get_title_with_year(properties) {
 }
 
 function addPolyline(title) {
-    // polyline = L.polyline([]).addTo(map);
-    // geojsonLayer.eachLayer(function(marker) {
-    //     if (title == marker.feature.properties.title)
-    //         polyline.addLatLng(marker.getLatLng());
-    // });
     var markers_features = [];
     var markers_cord = [];
     geojsonLayer.eachLayer(function(marker) {
@@ -142,7 +141,6 @@ function onmove() {
                 link.innerHTML = title_with_year;
                 item.setAttribute('sort_by', title.toLowerCase());
                 var details = item.appendChild(document.createElement('div'));
-                console.log(props.num_of_locations);
                 details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
                 link.onclick = function() {
                     $('#search_title').val(title);
@@ -258,27 +256,37 @@ function attachPopups() {
                         "<b>Directors:</b> " + properties.directors + '<br/>' + 
                         "<b>Rating:</b> " + properties.rating + '<br/>' +
                         "<b>Genres:</b> " + properties.genres + '<br/>' +
-                        "<a href=\"https://" + properties.url + "\" target=\"_blank\"><b>IMDb page</b></a>");
+                        "<a href=\"https://" + properties.url + "\" target=\"_blank\"><b>IMDb page</b></a><br/>" +
+                        "<a href=\"https://" + properties.url + "/synopsis\" target=\"_blank\"><b>IMDb synopsis</b></a>"); 
     });
 }
 
 function change_genres() {
     on_genres = [];
-    for (var i = 0; i < genre_checkboxes.length; i++) {
-        if (genre_checkboxes[i].checked) on_genres.push(genre_checkboxes[i].value);
+    for (var i = 0; i < genres_checkboxes.length; i++) {
+        if (genres_checkboxes[i].checked) on_genres.push(genres_checkboxes[i].value);
     }
     search();
     return false;
 }
 
-function check_genres(){
-    for (var i = 0; i < genre_checkboxes.length; i++) {
-        genre_checkboxes[i].checked = 'checked';
+function check_all_genres(){
+    for (var i = 0; i < genres_checkboxes.length; i++) {
+        genres_checkboxes[i].checked = 'checked';
+    }
+    change_genres();
+}
+
+function uncheck_all_genres(){
+    for (var i = 0; i < genres_checkboxes.length; i++) {
+        genres_checkboxes[i].checked = '';
     }
     change_genres();
 }
 
 genre_filters.onchange = change_genres;
+genre_checkall.onclick = check_all_genres;
+genre_uncheckall.onclick = uncheck_all_genres;
 
 function change_years() {
     on_years = [];
@@ -289,14 +297,23 @@ function change_years() {
     return false;
 }
 
-function check_years(){
+function check_all_years(){
     for (var i = 0; i < years_checkboxes.length; i++) {
         years_checkboxes[i].checked = 'checked';
     }
     change_years();
 }
 
+function uncheck_all_years(){
+    for (var i = 0; i < years_checkboxes.length; i++) {
+        years_checkboxes[i].checked = '';
+    }
+    change_years();
+}
+
 years_filters.onchange = change_years;
+years_checkall.onclick = check_all_years;
+years_uncheckall.onclick = uncheck_all_years;
 
 map.on('move', onmove);
 

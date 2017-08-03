@@ -35,7 +35,10 @@
 <input id='search_director' class='search-ui-director' placeholder='Search directors...' />
 <div class="genre_dropdown">
   <button class="genrebtn">Select genres</button>
-	<div id='genre_filters' class='genre-content'>
+  	<div class='genre-content'>
+  	<div><input type='button' id='check_all_genres' value='Check all'/></div>
+	<div><input type='button' id='uncheck_all_genres' value='Uncheck all'/></div>
+	<div id='genre_filters'>
 	  <div><input type='checkbox' checked='checked' class='genre_filter' value='Action'/><label>Action</label></div>
 	  <div><input type='checkbox' checked='checked' class='genre_filter' value='Adventure'/><label>Adventure</label></div>
 	  <div><input type='checkbox' checked='checked' class='genre_filter' value='Animation'/><label>Animation</label></div>
@@ -59,12 +62,17 @@
 	  <div><input type='checkbox' checked='checked' class='genre_filter' value='War'/><label>War</label></div>
 	  <div><input type='checkbox' checked='checked' class='genre_filter' value='Western'/><label>Western</label></div>
 	</div>
+	</div>
 </div>
 <div class="years_dropdown">
   <button class="yearsbtn">Select decades</button>
-	<div id='years_filters' class='years-content'>
+  	<div class='years-content'>
+    <div><input type='button' id='check_all_years' value='Check all'/></div>
+	<div><input type='button' id='uncheck_all_years' value='Uncheck all'/></div>
+	<div id='years_filters'>
 	  <div><input type='checkbox' checked='checked' class='years_filter' value='1985-1995'/><label>1985-1995</label></div>
 	  <div><input type='checkbox' checked='checked' class='years_filter' value='2005-2015'/><label>2005-2015</label></div>
+	</div>
 	</div>
 </div>
 <script src="script.js"></script>
