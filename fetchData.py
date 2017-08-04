@@ -35,7 +35,6 @@ def extract_ids(filename):
             except EOFError:
                 break
 
-    #ids = [id[:-1] for id in ids] # remove last character
     return ids
 
 
