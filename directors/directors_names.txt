@@ -19,4 +19,25 @@ aVDoug Atchison
 p9
 aVSimon Curtis
 p10
+a.(lp0
+VJohn Landis
+p1
+aVRob Letterman
+p2
+aVMichael Rymer
+p3
+aVJohn Pogue
+p4
+aVSebastian Schipper
+p5
+aVJohn Carpenter
+p6
+aVMira Nair
+p7
+aVRobert Zemeckis
+p8
+aVDoug Atchison
+p9
+aVSimon Curtis
+p10
 a.

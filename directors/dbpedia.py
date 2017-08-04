@@ -111,6 +111,7 @@ def fix_places(places):
     places = list(set(places)) # remove duplicates
     places = [place[place.rfind('/')+1:len(place)] for place in places] # only the name
     places = [place.replace('_', ' ') for place in places]
+    places = ", ".join(places)
     return places
 
 
@@ -138,7 +139,7 @@ def test(name):
     print director
 
 
-def main():
+def directors_data():
     directors_names = extract_directors_names("directors_names.txt")
     directors_names = list(set(directors_names)) # remove duplicates
     count = 0 # counts the number of results found
@@ -156,7 +157,7 @@ def main():
         print " =========== "
     print "DONE with {} directors".format(count)
 
-     # test("Christopher Nolan")
+    # test("Christopher Nolan")
 
 if __name__ == "__main__":
-    main()
+    directors_data()

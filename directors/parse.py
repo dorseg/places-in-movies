@@ -1,6 +1,11 @@
 import sys, os
 import pickle, json
+import dbpedia
 
+"""
+Run this file with
+> python parse.py <movies data directory>
+"""
 
 def parse_directors(data_dir):
     """
@@ -39,6 +44,8 @@ def main():
     directors = parse_directors(data_dir)
     save_in_file("directors_names.txt", directors)
     print "DONE"
+
+    dbpedia.directors_data()
 
 if __name__ == "__main__":
     main()
