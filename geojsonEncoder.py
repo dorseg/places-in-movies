@@ -1,5 +1,5 @@
 import ner, json, geojson, os
-from opencage.geocoder import OpenCageGeocode
+from geopy.geocoders import geonames
 from geojson import Point, Feature, FeatureCollection
 
 # first, run:
@@ -25,17 +25,17 @@ class GeoLocation(object):
 
 tagger = ner.SocketNER(host='localhost', port=9191, output_format='slashTags')
 key = '42bae5691544417f8d1a7922f8bc9d48'
-geocoder = OpenCageGeocode(key)
+geocoder = geonames.GeoNames(username="dorseg")
 features = []
-limit = 100
+limit = 5
 
 
 def get_geolocation(loc):
     geo = None
     result = geocoder.geocode(loc)
-    if result and len(result):
-        lng = result[0]['geometry']['lng']
-        lat = result[0]["geometry"]['lat']
+    if result:
+        lng = result.longitude
+        lat = result.latitude
         geo = GeoLocation(loc, lng, lat)
     return geo
 
@@ -67,11 +67,11 @@ def encode_to_geojson(data_folder):
                 continue
             ignore_keys = ["filming_locations", "synopsis"]
             movie_details = {key: movie_details[key] for key in movie_details if key not in ignore_keys}
-            movie_details["num_of_locations"] = len(geolocations);
+            movie_details["num_of_locations"] = len(geolocations)
             movie_details["marker-color"] = "0044FF"
             movie_details["marker-symbol"] = "cinema"
             for geo in geolocations:
-                #print geo
+                # print geo
                 props = movie_details.copy()
                 props["location"] = geo.location
                 point = Point(geo.get_cords())
