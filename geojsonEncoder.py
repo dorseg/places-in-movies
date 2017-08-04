@@ -1,5 +1,5 @@
 import ner, json, geojson, os
-from geopy.geocoders import geonames
+from geopy.geocoders import Nominatim
 from geojson import Point, Feature, FeatureCollection
 
 # first, run:
@@ -25,7 +25,7 @@ class GeoLocation(object):
 
 tagger = ner.SocketNER(host='localhost', port=9191, output_format='slashTags')
 key = '42bae5691544417f8d1a7922f8bc9d48'
-geocoder = geonames.GeoNames(username="dorseg")
+geocoder = Nominatim()
 features = []
 limit = 5
 
