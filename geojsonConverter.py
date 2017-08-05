@@ -107,7 +107,8 @@ def directors_to_geojson(data_folder):
             if not director_details['photo']:
                 director_details['photo'] = default_pic
             director_details['location'] = geolocation.location
-            director_details['movies'] = director_details['movies'][:3]
+            director_details["marker-color"] = "FF0000"
+            director_details["marker-symbol"] = "marker"
             props = director_details.copy()
             point = Point(geolocation.get_cords())
             feature = Feature(geometry=point, properties=props)
