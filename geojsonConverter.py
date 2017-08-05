@@ -28,19 +28,21 @@ key = '42bae5691544417f8d1a7922f8bc9d48'
 geocoder = OpenCageGeocode(key)
 features = []
 limit = 100
+default_pic = "default_pic.jpg"
 
 
 def get_geolocation(loc):
     geo = None
     result = geocoder.geocode(loc)
     if result and len(result):
+        loc = result[0]['formatted']
         lng = result[0]['geometry']['lng']
         lat = result[0]["geometry"]['lat']
         geo = GeoLocation(loc, lng, lat)
     return geo
 
 
-def encode_to_geojson(data_folder):
+def movie_to_geojson(data_folder):
     counter = 0
     files = os.listdir(data_folder)
     print "Start encoding files in {}".format(data_folder)
@@ -79,19 +81,52 @@ def encode_to_geojson(data_folder):
                 features.append(feature)
 
 
-def write_to_file():
+def directors_to_geojson(data_folder):
+    counter = 0
+    files = os.listdir(data_folder)
+    print "Start encoding files in {}".format(data_folder)
+    for file in files:
+        if counter == limit:
+            break
+        counter += 1
+        with open("{}/{}".format(data_folder, file), 'r') as f:
+            print "====Parsing file {}====".format(file)
+            director_details = json.loads(f.read())
+            places_birth = director_details['places_birth']
+            if not places_birth:
+                print "No place birth, continue..."
+                continue
+            try:
+                geolocation = get_geolocation(places_birth)
+            except Exception as e:
+                print e
+                break
+            if not geolocation:
+                print "No Geolocation, continue..."
+                continue
+            if not director_details['photo']:
+                director_details['photo'] = default_pic
+            director_details['location'] = geolocation.location
+            director_details['movies'] = director_details['movies'][:3]
+            props = director_details.copy()
+            point = Point(geolocation.get_cords())
+            feature = Feature(geometry=point, properties=props)
+            features.append(feature)
+
+
+def write_to_file(filename):
     collection = FeatureCollection(features)
-    with open("movies.geojson", 'w') as out:
+    with open(filename, 'w') as out:
         geojson.dump(collection, out)
 
 
 def main():
-    data_folder1 = u"data/1985_1995"
-    data_folder2 = u"data/2005_2015"
-    encode_to_geojson(data_folder1)
-    encode_to_geojson(data_folder2)
+    #data_folder = u"data/1985_1995"
+    #movie_to_geojson(data_folder1)
+    data_folder = u"directors/data"
+    directors_to_geojson(data_folder)
     print "Created {} featurs".format(len(features))
-    write_to_file()
+    write_to_file("directors.geojson")
 
 
 if __name__ == '__main__':
