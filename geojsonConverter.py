@@ -124,10 +124,10 @@ def write_to_file(filename):
 def main():
     #data_folder = u"data/1985_1995"
     #movie_to_geojson(data_folder1)
-    data_folder = "directors/data"
-    directors_to_geojson(data_folder)
+    data_folder = "1990_1999"
+    movie_to_geojson(data_folder)
     print "Created {} features".format(len(features))
-    write_to_file("directors.geojson")
+    write_to_file("1990s1.geojson")
 
     # 1990s1.geojson
     # directors.geojson
