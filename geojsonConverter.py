@@ -27,7 +27,7 @@ tagger = ner.SocketNER(host='localhost', port=9191, output_format='slashTags')
 key = '42bae5691544417f8d1a7922f8bc9d48'
 geocoder = OpenCageGeocode(key)
 features = []
-limit = 100
+limit = 2500
 default_pic = "default_pic.jpg"
 
 
@@ -124,10 +124,10 @@ def write_to_file(filename):
 def main():
     #data_folder = u"data/1985_1995"
     #movie_to_geojson(data_folder1)
-    data_folder = u"directors/data"
-    directors_to_geojson(data_folder)
+    data_folder = u"data/2000_2009"
+    movie_to_geojson(data_folder)
     print "Created {} featurs".format(len(features))
-    write_to_file("directors.geojson")
+    write_to_file("2000s1.geojson")
 
 
 if __name__ == '__main__':
