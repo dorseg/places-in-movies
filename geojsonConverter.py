@@ -24,7 +24,7 @@ class GeoLocation(object):
 
 
 tagger = ner.SocketNER(host='localhost', port=9191, output_format='slashTags')
-key = '62b1d8e337ce45d1b49f37ef167e7911'
+key = '42bae5691544417f8d1a7922f8bc9d48'
 geocoder = OpenCageGeocode(key)
 features = []
 limit = 2500
@@ -44,7 +44,7 @@ def get_geolocation(loc):
 
 def movie_to_geojson(data_folder):
     counter = 0
-    files = os.listdir(data_folder)
+    files = sorted(os.listdir(data_folder))
     print "Start encoding files in {}".format(data_folder)
     for file in files:
         if counter == limit:
@@ -124,10 +124,10 @@ def write_to_file(filename):
 def main():
     #data_folder = u"data/1985_1995"
     #movie_to_geojson(data_folder1)
-    data_folder = "1990_1999"
+    data_folder = "data/2010_2017"
     movie_to_geojson(data_folder)
     print "Created {} features".format(len(features))
-    write_to_file("1990s1.geojson")
+    write_to_file("2010s1.geojson")
 
     # 1990s1.geojson
     # directors.geojson
