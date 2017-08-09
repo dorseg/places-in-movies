@@ -45,23 +45,11 @@ $('.menu-ui a').on('click', function() {
     return false;
 });
 
-function isNameInArray(name, items){
-    for (var i=0; i<items.length; i++){
-        item = items[i];
-        var link = item.childNodes[0];
-        var link_name = link.innerHTML;
-        if (name == link_name){
-            return true;
-            break;
-        }
-    }
-    return false;
-}
-
 function onmove() {
     // Get the map bounds - the top-left and bottom-right locations.
     var inBounds = [],
-        bounds = map.getBounds();
+        bounds = map.getBounds(),
+        inArray = {};
     markerList.innerHTML = "";
     var numOfBounds = 0;
     markers.eachLayer(function(marker) {
@@ -71,7 +59,7 @@ function onmove() {
         // with the current map bounds.
         if (bounds.contains(marker.getLatLng())) {
             numOfBounds++;
-            if (isNameInArray(name, inBounds) == false){
+            if (!inArray[name]){
                 var item = document.createElement('div');
                 item.className = 'item';
                 var link = item.appendChild(document.createElement('a'));
@@ -88,6 +76,7 @@ function onmove() {
                   map.panTo(marker.getLatLng());
                 });
                 inBounds.push(item);
+                inArray[name] = true;
             }
         }
     });
