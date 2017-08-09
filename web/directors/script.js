@@ -19,6 +19,8 @@ L.control.layers(layers).addTo(map);
 
 var markers = new L.MarkerClusterGroup();
 var markers_size = 0;
+var items = {};
+var curr_markers = [];
 
 var geojsonLayer = omnivore.geojson('directors.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -27,11 +29,31 @@ var geojsonLayer = omnivore.geojson('directors.geojson', null, L.mapbox.featureL
     
     // Now we can transfer single layers / markers to the marker cluster group.
     markers.addLayer(geojsonLayer); // use the global variable markers.
+    markers.eachLayer(function(marker){
+      markers_size++;
+      var props = marker.feature.properties;
+      var name = props.name;
+      var item = document.createElement('div');
+      item.className = 'item';
+      var link = item.appendChild(document.createElement('a'));
+      link.href = '#';
+      link.className = 'name';
+      link.innerHTML = name;
+      item.setAttribute('sort_by', name.toLowerCase());
+      link.onclick = function() {
+          map.setView(marker.getLatLng(), 15);
+          marker.openPopup();
+      };
+      // Marker interaction
+      marker.on('click', function(e) {
+        map.panTo(marker.getLatLng());
+      });
+      items[name] = item;
+      curr_markers.push(name);   
+    });
     map.fitBounds(geojsonLayer.getBounds());
     markers.addTo(map);
-    markers.eachLayer(function(marker) {
-        markers_size++;
-    });
+    console.log("Total Markers: " + markers_size);
   });
 
 
@@ -45,12 +67,25 @@ $('.menu-ui a').on('click', function() {
     return false;
 });
 
+function itemsArrayEquals(a,b){
+    if (a.length != b.length){
+        return false;
+    }
+    for(var i=0; i<a.length; i++){
+        var a_name = a[i];
+        var b_name = b[i];
+        if (a_name != b_name){
+            return false;
+        }
+    }
+    return true;
+}
+
 function onmove() {
     // Get the map bounds - the top-left and bottom-right locations.
     var inBounds = [],
         bounds = map.getBounds(),
         inArray = {};
-    markerList.innerHTML = "";
     var numOfBounds = 0;
     markers.eachLayer(function(marker) {
         var props = marker.feature.properties;
@@ -60,32 +95,22 @@ function onmove() {
         if (bounds.contains(marker.getLatLng())) {
             numOfBounds++;
             if (!inArray[name]){
-                var item = document.createElement('div');
-                item.className = 'item';
-                var link = item.appendChild(document.createElement('a'));
-                link.href = '#';
-                link.className = 'name';
-                link.innerHTML = name;
-                item.setAttribute('sort_by', name.toLowerCase());
-                link.onclick = function() {
-                    map.setView(marker.getLatLng(), 15);
-                    marker.openPopup();
-                };
-                // Marker interaction
-                marker.on('click', function(e) {
-                  map.panTo(marker.getLatLng());
-                });
-                inBounds.push(item);
+                inBounds.push(name);
                 inArray[name] = true;
             }
         }
     });
     inBounds.sort(function(a, b) {
-        return a.getAttribute('sort_by').localeCompare(b.getAttribute('sort_by'));
+        return a.localeCompare(b);
     });
-    inBounds.forEach(function(item) {
-        markerList.appendChild(item);
-    });
+    if (!itemsArrayEquals(curr_markers, inBounds)){
+        markerList.innerHTML = "";
+        inBounds.forEach(function(name) {
+            markerList.appendChild(items[name]);
+        });
+        curr_markers = inBounds;
+    }
+    console.log("Markers in bounds: " + numOfBounds);
     if (numOfBounds == markers_size){
       $('.menu-ui a').removeClass('active');
     }

@@ -19,8 +19,9 @@ L.control.layers(layers).addTo(map);
 
 var markers = new L.MarkerClusterGroup();
 var markers_size = 0;
-//var polyline = null;
 var hull = null;
+var items = {};
+var curr_markers = [];
 
 var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -29,10 +30,38 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
     
     // Now we can transfer single layers / markers to the marker cluster group.
     markers.addLayer(geojsonLayer); // use the global variable markers.
+    markers.eachLayer(function(marker) {
+        markers_size++;
+        var props = marker.feature.properties;
+        var id = props.id;
+        var title = props.title;
+        var title_with_year = get_title_with_year(props);
+        var item = document.createElement('div');
+        item.className = 'item';
+        var link = item.appendChild(document.createElement('a'));
+        link.href = '#';
+        link.className = 'title';
+        link.innerHTML = title_with_year;
+        item.setAttribute('sort_by', title.toLowerCase());
+        var details = item.appendChild(document.createElement('div'));
+        details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
+        link.onclick = function() {
+            $('#search_title').val(title_with_year);
+            search();
+            map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
+            addPolyline(title);
+        };
+        // Marker interaction
+        marker.on('click', function(e) {
+          map.panTo(marker.getLatLng());
+        });
+        items[title_with_year] = item;
+        curr_markers.push(title_with_year);    
+    }); 
     map.fitBounds(geojsonLayer.getBounds());
     markers.addTo(map);
+    console.log("Total Markers: " + markers_size);
   });
-
 
 var markerList = document.getElementById('listings');
 var genre_filters = document.getElementById('genre_filters');
@@ -98,10 +127,18 @@ function addPolyline(title) {
     hull.addTo(map);
 }
 
-function isTitleInArray(title, item){
-    var link = item.childNodes[0];
-    var link_title = link.innerHTML;
-    return title == link_title;
+function itemsArrayEquals(a,b){
+    if (a.length != b.length){
+        return false;
+    }
+    for(var i=0; i<a.length; i++){
+        var a_title = a[i];
+        var b_title = b[i];
+        if (a_title != b_title){
+            return false;
+        }
+    }
+    return true;
 }
 
 function onmove() {
@@ -109,11 +146,8 @@ function onmove() {
     var inBounds = [],
         bounds = map.getBounds(),
         inArray = {};
-    markerList.innerHTML = "";
     var numOfBounds = 4;
-    var markers_size = 0;
     markers.eachLayer(function(marker) {
-        markers_size++;
         var props = marker.feature.properties;
         var id = props.id;
         var title = props.title;
@@ -123,38 +157,22 @@ function onmove() {
         if (bounds.contains(marker.getLatLng())) {
             numOfBounds++;
             if (!inArray[id]){
-                var item = document.createElement('div');
-                item.className = 'item';
-                var link = item.appendChild(document.createElement('a'));
-                link.href = '#';
-                link.className = 'title';
-                link.innerHTML = title_with_year;
-                item.setAttribute('sort_by', title.toLowerCase());
-                var details = item.appendChild(document.createElement('div'));
-                details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
-                link.onclick = function() {
-                    $('#search_title').val(title_with_year);
-                    search();
-                    map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
-                    addPolyline(title);
-                };
-                // Marker interaction
-                marker.on('click', function(e) {
-                  map.panTo(marker.getLatLng());
-                });
-                inBounds.push(item);
+                inBounds.push(title_with_year);
                 inArray[id] = true;
             }
         }
     });
     inBounds.sort(function(a, b) {
-        return a.getAttribute('sort_by').localeCompare(b.getAttribute('sort_by'));
+        return a.localeCompare(b);
     });
-    inBounds.forEach(function(item) {
-        markerList.appendChild(item);
-    });
+    if (!itemsArrayEquals(curr_markers, inBounds)){
+        markerList.innerHTML = "";
+        inBounds.forEach(function(title) {
+            markerList.appendChild(items[title]);
+        });
+        curr_markers = inBounds;
+    }
     console.log("Markers in bounds: " + numOfBounds);
-    console.log("Total Markers: " + markers_size);
     if (numOfBounds == markers_size){
       $('.menu-ui a').removeClass('active');
     }
