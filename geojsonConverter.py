@@ -127,7 +127,7 @@ def main():
     data_folder = "data/2010_2017"
     movie_to_geojson(data_folder)
     print "Created {} features".format(len(features))
-    write_to_file("2010s1.geojson")
+    write_to_file("2010s2.geojson")
 
     # 1990s1.geojson
     # directors.geojson
