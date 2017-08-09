@@ -44,6 +44,7 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
         link.innerHTML = title_with_year;
         item.setAttribute('sort_by', title.toLowerCase());
         var details = item.appendChild(document.createElement('div'));
+        details.className = 'details';
         details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
         link.onclick = function() {
             $('#search_title').val(title_with_year);
