@@ -31,9 +31,6 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
     markers.addLayer(geojsonLayer); // use the global variable markers.
     map.fitBounds(geojsonLayer.getBounds());
     markers.addTo(map);
-    markers.eachLayer(function(marker) {
-        markers_size++;
-    });
   });
 
 
@@ -59,10 +56,6 @@ $('.yearsbtn').on('click', function() {
 
 
 $('.menu-ui a').on('click', function() {
-    // For each filter link, get the 'data-filter' attribute value.
-    // if (polyline != null){
-    //     polyline.remove();
-    // }
     if (hull != null){
         map.removeLayer(hull);
     }
@@ -105,34 +98,31 @@ function addPolyline(title) {
     hull.addTo(map);
 }
 
-function isTitleInArray(title, items){
-    for (var i=0; i<items.length; i++){
-        item = items[i];
-        var link = item.childNodes[0];
-        var link_title = link.innerHTML;
-        if (title == link_title){
-            return true;
-            break;
-        }
-    }
-    return false;
+function isTitleInArray(title, item){
+    var link = item.childNodes[0];
+    var link_title = link.innerHTML;
+    return title == link_title;
 }
 
 function onmove() {
     // Get the map bounds - the top-left and bottom-right locations.
     var inBounds = [],
-        bounds = map.getBounds();
+        bounds = map.getBounds(),
+        inArray = {};
     markerList.innerHTML = "";
-    var numOfBounds = 1;
+    var numOfBounds = 4;
+    var markers_size = 0;
     markers.eachLayer(function(marker) {
+        markers_size++;
         var props = marker.feature.properties;
+        var id = props.id;
         var title = props.title;
         var title_with_year = get_title_with_year(props);
         // For each marker, consider whether it is currently visible by comparing
         // with the current map bounds.
         if (bounds.contains(marker.getLatLng())) {
             numOfBounds++;
-            if (isTitleInArray(title_with_year, inBounds) == false){
+            if (!inArray[id]){
                 var item = document.createElement('div');
                 item.className = 'item';
                 var link = item.appendChild(document.createElement('a'));
@@ -143,7 +133,7 @@ function onmove() {
                 var details = item.appendChild(document.createElement('div'));
                 details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
                 link.onclick = function() {
-                    $('#search_title').val(title);
+                    $('#search_title').val(title_with_year);
                     search();
                     map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
                     addPolyline(title);
@@ -153,6 +143,7 @@ function onmove() {
                   map.panTo(marker.getLatLng());
                 });
                 inBounds.push(item);
+                inArray[id] = true;
             }
         }
     });
@@ -162,10 +153,37 @@ function onmove() {
     inBounds.forEach(function(item) {
         markerList.appendChild(item);
     });
+    console.log("Markers in bounds: " + numOfBounds);
+    console.log("Total Markers: " + markers_size);
     if (numOfBounds == markers_size){
       $('.menu-ui a').removeClass('active');
     }
     else $('.menu-ui a').addClass('active');
+}
+
+function onmove1() {
+    markerList.innerHTML = "";
+    markers.eachLayer(function(marker) {
+        marker.on('click', function(e) {
+            var props = marker.feature.properties;
+            var title = props.title;
+            var title_with_year = get_title_with_year(props);
+            var item = document.createElement('div');
+            item.className = 'item';
+            var link = item.appendChild(document.createElement('a'));
+            link.href = '#';
+            link.className = 'title';
+            link.innerHTML = title_with_year;
+            var details = item.appendChild(document.createElement('div'));
+            details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
+            markerList.appendChild(item);
+            $('#search_title').val(title_with_year);
+            search();
+            map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
+            addPolyline(title);
+            marker.openPopup();
+        });
+    });
 }
 
 function search() {
@@ -175,9 +193,6 @@ function search() {
 
     filter_by(title, director, on_genres, on_years);
 
-    // if (polyline!= null){
-    //     polyline.remove();
-    // }
     if (hull != null){
         map.removeLayer(hull);
     }
@@ -199,7 +214,8 @@ function filter_by(title, director, genres, years) {
 }
 
 function showMovie(feature, query) {
-    return feature.properties.title
+    var title_with_year = get_title_with_year(feature.properties);
+    return title_with_year
         .toLowerCase()
         .indexOf(query.toLowerCase()) !== -1;
 }
