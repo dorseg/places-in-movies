@@ -161,31 +161,6 @@ function onmove() {
     else $('.menu-ui a').addClass('active');
 }
 
-function onmove1() {
-    markerList.innerHTML = "";
-    markers.eachLayer(function(marker) {
-        marker.on('click', function(e) {
-            var props = marker.feature.properties;
-            var title = props.title;
-            var title_with_year = get_title_with_year(props);
-            var item = document.createElement('div');
-            item.className = 'item';
-            var link = item.appendChild(document.createElement('a'));
-            link.href = '#';
-            link.className = 'title';
-            link.innerHTML = title_with_year;
-            var details = item.appendChild(document.createElement('div'));
-            details.innerHTML = props.directors + ' &middot; ' + props.num_of_locations + " locations";
-            markerList.appendChild(item);
-            $('#search_title').val(title_with_year);
-            search();
-            map.fitBounds(geojsonLayer.getBounds(), {maxZoom: 15});
-            addPolyline(title);
-            marker.openPopup();
-        });
-    });
-}
-
 function search() {
     // get the value of the search input field
     var title = $('#search_title').val().toLowerCase();
