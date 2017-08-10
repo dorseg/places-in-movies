@@ -21,6 +21,9 @@ var markers = new L.MarkerClusterGroup();
 var markers_size = 0;
 var items = {};
 var curr_markers = [];
+var loader = document.getElementById('loader');
+
+startLoading();
 
 var geojsonLayer = omnivore.geojson('directors.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -53,6 +56,7 @@ var geojsonLayer = omnivore.geojson('directors.geojson', null, L.mapbox.featureL
     });
     map.fitBounds(geojsonLayer.getBounds());
     markers.addTo(map);
+    finishedLoading();
     console.log("Total Markers: " + markers_size);
   });
 
@@ -60,12 +64,27 @@ var geojsonLayer = omnivore.geojson('directors.geojson', null, L.mapbox.featureL
 var markerList = document.getElementById('listings');
 
 $('.menu-ui a').on('click', function() {
+    startLoading();
     $('#search_title').val('');
     $('#search_director').val('');
     filter_by("","");
     map.fitBounds(geojsonLayer.getBounds());
+    finishedLoading();
     return false;
 });
+
+function startLoading() {
+    loader.style.display = "block";
+}
+
+function finishedLoading() {
+    setTimeout(function() {
+        // then, after a half-second, add the class 'hide', which hides
+        // it completely and ensures that the user can interact with the
+        // map again.
+        loader.style.display = "none";
+    }, 500);
+}
 
 function itemsArrayEquals(a,b){
     if (a.length != b.length){

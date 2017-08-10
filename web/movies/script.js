@@ -22,6 +22,9 @@ var markers_size = 0;
 var hull = null;
 var items = {};
 var curr_markers = [];
+var loader = document.getElementById('loader');
+
+startLoading();
 
 var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLayer())
   .on("ready", function() {
@@ -60,6 +63,7 @@ var geojsonLayer = omnivore.geojson('movies.geojson', null, L.mapbox.featureLaye
     }); 
     map.fitBounds(geojsonLayer.getBounds());
     markers.addTo(map);
+    finishedLoading();
     console.log("Total Markers: " + markers_size);
   });
 
@@ -85,6 +89,7 @@ $('.yearsbtn').on('click', function() {
 
 
 $('.menu-ui a').on('click', function() {
+    startLoading();
     if (hull != null){
         map.removeLayer(hull);
     }
@@ -94,8 +99,22 @@ $('.menu-ui a').on('click', function() {
     check_all_years();
     filter_by("","",on_genres, on_years);
     map.fitBounds(geojsonLayer.getBounds());
+    finishedLoading();
     return false;
 });
+
+function startLoading() {
+    loader.style.display = "block";
+}
+
+function finishedLoading() {
+    setTimeout(function() {
+        // then, after a half-second, add the class 'hide', which hides
+        // it completely and ensures that the user can interact with the
+        // map again.
+        loader.style.display = "none";
+    }, 500);
+}
 
 function get_title_with_year(properties) {
   return properties.title + " (" + properties.year + ")";
